@@ -3,14 +3,12 @@ package br.com.ghidini.banco.model;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  * @author raghidin
  *
  */
-@Document
 public class TransacaoBancaria {
 	
 	private int contaOrigem;

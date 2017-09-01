@@ -1,6 +1,7 @@
 package br.com.ghidini.banco.controller;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.ghidini.banco.factory.CalculadorDeTaxasFactory;
 import br.com.ghidini.banco.model.TransacaoBancaria;
-import br.com.ghidini.banco.repository.TransacaoBancariaRepository;
 
 /**
  * @author raghidin
@@ -21,27 +21,22 @@ import br.com.ghidini.banco.repository.TransacaoBancariaRepository;
 @RestController
 public class TransacaoBancariaController {
 
-	@Autowired
-	private TransacaoBancariaRepository transacaoBancariaRepository;
+	private List<TransacaoBancaria> transacao = new ArrayList<TransacaoBancaria>();
+	
 	@Autowired
 	CalculadorDeTaxasFactory calculador;
 
 	@CrossOrigin
 	@GetMapping("/transacoes")
 	public List<TransacaoBancaria> listAll(){
-		return transacaoBancariaRepository.findAll();
-	}
-	
-	@CrossOrigin
-	@GetMapping("/delete")
-	public void delete(){
-		transacaoBancariaRepository.deleteAll();
+		return transacao;
 	}
 
 	@CrossOrigin
 	@PostMapping("/cadastro-transacoes")
 	public TransacaoBancaria insert(@RequestBody TransacaoBancaria transacaoBancaria){
-		return transacaoBancariaRepository.insert(transacaoBancaria);
+		transacao.add(transacaoBancaria);
+		return transacao.get(transacao.size()-1);
 	}
 
 	@CrossOrigin

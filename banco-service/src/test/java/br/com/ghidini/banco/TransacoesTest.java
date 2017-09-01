@@ -38,14 +38,7 @@ public class TransacoesTest {
 	private String URL_CADASTRO = "http://localhost:3004/cadastro-transacoes";
 	private String URL_CALCULO_TAXA = "http://localhost:3004/taxa";
 
-	@Test
-	public void teste_lista_todas_transacoes() throws JsonParseException, JsonMappingException, IOException {		
-		String response = restTemplate.getForObject(URL, String.class);
-		List<TransacaoBancaria> transacoes = mapper.readValue(response, 
-				mapper.getTypeFactory().constructCollectionType(List.class, TransacaoBancaria.class));
-		Assert.assertNotNull(transacoes);
-	}
-	
+
 	@Test
 	public void teste_inserir_transacao_taxa_A() {
 		TransacaoBancaria transacaoBancaria = gerarTransacao();
@@ -56,7 +49,22 @@ public class TransacoesTest {
 		TransacaoBancaria response = restTemplate.postForObject(URL_CADASTRO, transacaoBancaria, TransacaoBancaria.class);
 		Assert.assertTrue(transacaoBancaria.getContaDestino() == response.getContaDestino());
 	}
-	
+
+	@Test
+	public void teste_lista_todas_transacoes() throws JsonParseException, JsonMappingException, IOException {		
+		TransacaoBancaria transacaoBancaria = gerarTransacao();
+		transacaoBancaria.setDataTransferencia(new Date());
+		transacaoBancaria.setValorTransferencia(new BigDecimal("1000"));
+		TransacaoBancaria taxa = restTemplate.postForObject(URL_CALCULO_TAXA, transacaoBancaria, TransacaoBancaria.class);
+		transacaoBancaria.setTaxa(taxa.getTaxa());
+		restTemplate.postForObject(URL_CADASTRO, transacaoBancaria, TransacaoBancaria.class);
+
+		String response = restTemplate.getForObject(URL, String.class);
+		List<TransacaoBancaria> transacoes = mapper.readValue(response, 
+				mapper.getTypeFactory().constructCollectionType(List.class, TransacaoBancaria.class));
+		Assert.assertNotNull(transacoes);
+	}
+
 	@Test
 	public void teste_inserir_transacao_taxa_B() {
 		TransacaoBancaria transacaoBancaria = gerarTransacao();
@@ -65,9 +73,9 @@ public class TransacoesTest {
 		TransacaoBancaria taxa = restTemplate.postForObject(URL_CALCULO_TAXA, transacaoBancaria, TransacaoBancaria.class);
 		transacaoBancaria.setTaxa(taxa.getTaxa());
 		TransacaoBancaria response = restTemplate.postForObject(URL_CADASTRO, transacaoBancaria, TransacaoBancaria.class);
-		Assert.assertTrue(transacaoBancaria.getContaDestino() == response.getContaDestino());
+		Assert.assertTrue(transacaoBancaria.getValorTransferencia().compareTo(response.getValorTransferencia())==0);
 	}
-	
+
 	@Test
 	public void teste_inserir_transacao_taxa_C_10() {
 		TransacaoBancaria transacaoBancaria = gerarTransacao();
@@ -76,9 +84,9 @@ public class TransacoesTest {
 		TransacaoBancaria taxa = restTemplate.postForObject(URL_CALCULO_TAXA, transacaoBancaria, TransacaoBancaria.class);
 		transacaoBancaria.setTaxa(taxa.getTaxa());
 		TransacaoBancaria response = restTemplate.postForObject(URL_CADASTRO, transacaoBancaria, TransacaoBancaria.class);
-		Assert.assertTrue(transacaoBancaria.getContaDestino() == response.getContaDestino());
+		Assert.assertTrue(transacaoBancaria.getValorTransferencia().compareTo(response.getValorTransferencia())==0);
 	}
-	
+
 	@Test
 	public void teste_inserir_transacao_taxa_C_20() {
 		TransacaoBancaria transacaoBancaria = gerarTransacao();
@@ -87,9 +95,9 @@ public class TransacoesTest {
 		TransacaoBancaria taxa = restTemplate.postForObject(URL_CALCULO_TAXA, transacaoBancaria, TransacaoBancaria.class);
 		transacaoBancaria.setTaxa(taxa.getTaxa());
 		TransacaoBancaria response = restTemplate.postForObject(URL_CADASTRO, transacaoBancaria, TransacaoBancaria.class);
-		Assert.assertTrue(transacaoBancaria.getContaDestino() == response.getContaDestino());
+		Assert.assertTrue(transacaoBancaria.getValorTransferencia().compareTo(response.getValorTransferencia())==0);
 	}
-	
+
 	@Test
 	public void teste_inserir_transacao_taxa_C_30() {
 		TransacaoBancaria transacaoBancaria = gerarTransacao();
@@ -98,9 +106,9 @@ public class TransacoesTest {
 		TransacaoBancaria taxa = restTemplate.postForObject(URL_CALCULO_TAXA, transacaoBancaria, TransacaoBancaria.class);
 		transacaoBancaria.setTaxa(taxa.getTaxa());
 		TransacaoBancaria response = restTemplate.postForObject(URL_CADASTRO, transacaoBancaria, TransacaoBancaria.class);
-		Assert.assertTrue(transacaoBancaria.getContaDestino() == response.getContaDestino());
+		Assert.assertTrue(transacaoBancaria.getValorTransferencia().compareTo(response.getValorTransferencia())==0);
 	}
-	
+
 	@Test
 	public void teste_inserir_transacao_taxa_C_40() {
 		TransacaoBancaria transacaoBancaria = gerarTransacao();
@@ -109,9 +117,9 @@ public class TransacoesTest {
 		TransacaoBancaria taxa = restTemplate.postForObject(URL_CALCULO_TAXA, transacaoBancaria, TransacaoBancaria.class);
 		transacaoBancaria.setTaxa(taxa.getTaxa());
 		TransacaoBancaria response = restTemplate.postForObject(URL_CADASTRO, transacaoBancaria, TransacaoBancaria.class);
-		Assert.assertTrue(transacaoBancaria.getContaDestino() == response.getContaDestino());
+		Assert.assertTrue(transacaoBancaria.getValorTransferencia().compareTo(response.getValorTransferencia())==0);
 	}
-	
+
 	@Test
 	public void teste_nao_existem_taxas_aplicaveis() {
 		TransacaoBancaria transacaoBancaria = gerarTransacao();
@@ -120,9 +128,11 @@ public class TransacoesTest {
 		TransacaoBancaria taxa = restTemplate.postForObject(URL_CALCULO_TAXA, transacaoBancaria, TransacaoBancaria.class);
 		transacaoBancaria.setTaxa(taxa.getTaxa());
 		TransacaoBancaria response = restTemplate.postForObject(URL_CADASTRO, transacaoBancaria, TransacaoBancaria.class);
-		Assert.assertTrue(transacaoBancaria.getContaDestino() == response.getContaDestino());
+		Assert.assertTrue(transacaoBancaria.getValorTransferencia().compareTo(response.getValorTransferencia())==0);
 	}
-	
+
+
+
 	private TransacaoBancaria gerarTransacao() {
 		TransacaoBancaria transacaoBancaria= new TransacaoBancaria();
 		transacaoBancaria.setContaDestino(123456);
